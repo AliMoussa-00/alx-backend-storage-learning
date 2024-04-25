@@ -9,7 +9,7 @@ DELIMITER $$
 CREATE PROCEDURE ComputeAverageScoreForUser(IN user_id INT)
 BEGIN
 DECLARE average FLOAT DEFAULT 0;
-SELECT AVG(score) INTO average FROM corrections
+SELECT SUM(score) / count(*) INTO average FROM corrections
 WHERE user_id = user_id;
 
 -- updating the users score
