@@ -4,7 +4,7 @@ MongoDB is a **document-oriented** database classified as NoSQL
 
 [MongoDB and Python]([Python and MongoDB: Connecting to NoSQL Databases – Real Python](https://realpython.com/introduction-to-mongodb-and-python/))
 
-[tasks]()
+[tasks](https://drive.google.com/file/d/10MXORCWx8ImUvQA8RYUURAZJwiptr8Ao/view?usp=drive_link)
 
 ---
 
