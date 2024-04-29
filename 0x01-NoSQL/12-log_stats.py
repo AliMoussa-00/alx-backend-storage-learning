@@ -15,7 +15,8 @@ def get_log_stats(nginx_collection):
         count = nginx_collection.count_documents({'method': method})
         print(f'\tmethod {method}: {count}')
 
-    print(f'{nginx_collection.count_documents({"path": "/status"})} status check')
+    status = nginx_collection.count_documents({"path": "/status"})
+    print(f'{status} status check')
 
 
 def main():
@@ -25,5 +26,5 @@ def main():
     get_log_stats(client.logs.nginx)
 
 
-if '__name__' == '__main__':
+if __name__ == '__main__':
     main()
