@@ -22,7 +22,8 @@ def count_url_requests(method: Callable) -> Callable:
         Wrapper function that increments the count of url accessed
         and adding an expiration time of 10 sec.
         """
-        key = 'count: {}'.format(url)
+        key = f'count: {{{url}}}'
+        print(key)
         r.incr(key)
 
         r.expire(key, 10)
@@ -48,5 +49,5 @@ if __name__ == "__main__":
     print(response)
 
     # getting the cached url counter
-    key = 'count: ' + url
+    key = f'count: {{{url}}}'
     print(r.get(key))

@@ -63,12 +63,17 @@ def replay(method: Callable) -> None:
         return
 
     func_name = method.__qualname__
-    print(f'{func_name} was called {int(r.get(func_name))} times:')
+    count = r.get(func_name)
+    try:
+        count = int(count.decode('utf-8'))
+    except Exception:
+        count = 0
+    print(f'{func_name} was called {count} times:')
 
     input_list = r.lrange(f'{func_name}:inputs', 0, -1)
     output_list = r.lrange(f'{func_name}:outputs', 0, -1)
     for input, output in zip(input_list, output_list):
-        print('{}(*({},)) -> {}'.format(
+        print('{}(*{}) -> {}'.format(
             func_name,
             input.decode("utf-8"),
             output.decode("utf-8")
@@ -103,7 +108,7 @@ class Cache:
     def get(
             self,
             key: str,
-            fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
+            fn: Optional[Callable] = None) -> Any:
         """
         Retrieves the value associated with the given key from the cache.
         """
