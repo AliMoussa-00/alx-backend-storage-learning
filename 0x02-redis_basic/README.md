@@ -2,7 +2,7 @@
 
 [learn redis]([How to Use Redis With Python – Real Python](https://realpython.com/python-redis/))
 
-[tasks]()
+[tasks](https://drive.google.com/file/d/1PvyGLhi5sSNWuz_luvYj6EkHthR_aK3o/view?usp=drive_link)
 
 ---
 
@@ -303,3 +303,118 @@ with r.pipeline() as pipe:
 ```
 
 ---
+## Understanding Decorator Functions
+
+In Python, decorators are a powerful feature that allows you to modify or extend the behavior of functions or methods. Decorators use the concept of wrapper functions to achieve this functionality. Additionally, the `functools.wraps` decorator is often used to preserve the metadata of the original function when creating decorators.
+
+### 1. Decorator Function
+
+A decorator function is a function that takes another function as input and returns a new function. The new function typically includes additional functionality before or after calling the original function.
+
+```python
+def my_decorator(func):
+    def wrapper(*args, **kwargs):
+        # Additional functionality before calling the original function
+        print("Before calling the function")
+        result = func(*args, **kwargs)  # Call the original function
+        # Additional functionality after calling the original function
+        print("After calling the function")
+        return result
+    return wrapper
+```
+
+**!!** Without the use of `functools.wraps` , the metada of the original function will be **lost** like (docstring ) , that is why we need to use `functools.wraps`
+
+### 2. Wrapper
+
+The wrapper function is the new function returned by the decorator function. It wraps around the original function and **adds extra functionality**.
+
+### 3. functools.wraps
+
+`functools.wraps` is a decorator provided by the `functools` module that is commonly used inside decorator functions. It **copies the metadata** (such as name, docstring) from the original function to the wrapper function, preserving important information about the function.
+
+```python
+from functools import wraps
+
+def my_decorator(func):
+    @wraps(func)  # Preserve metadata of the original function
+    def wrapper(*args, **kwargs):
+        # Additional functionality before calling the original function
+        print("Before calling the function")
+        result = func(*args, **kwargs)  # Call the original function
+        # Additional functionality after calling the original function
+        print("After calling the function")
+        return result
+    return wrapper
+```
+
+### Example
+
+```python
+from functools import wraps
+
+def my_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print("Before calling the function")
+        result = func(*args, **kwargs)
+        print("After calling the function")
+        return result
+    return wrapper
+
+@my_decorator
+def my_function(x, y):
+    """Add two numbers"""
+    return x + y
+
+result = my_function(3, 5)
+print("Result:", result)
+print("Function Name:", my_function.__name__)
+print("Docstring:", my_function.__doc__)
+```
+
+In this example, `my_decorator` is a decorator function that wraps around `my_function`. The `wrapper` function adds extra functionality before and after calling `my_function`. Thanks to `functools.wraps`, the metadata of `my_function` (name and docstring) is preserved in the decorated function.
+
+### 4. __qualname__
+
+In Python, the qualified name of a function or method refers to its fully-qualified name within its module or class hierarchy. It includes the module name, class names (if the function or method is within a class), and the function or method name itself.
+
+**!!** By using the qualified name, you can uniquely identify each function and track how many times it has been called.
+
+```python
+import redis
+from functools import wraps
+from typing import Callable
+
+# Connect to Redis server
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+def count_calls(method: Callable) -> Callable:
+    @wraps(method)
+    def wrapper(*args, **kwargs):
+        # Increment call count
+        function_name = method.__qualname__
+        call_count = r.incr(function_name)
+        print(f"{function_name} called {call_count} times")
+        return method(*args, **kwargs)
+    return wrapper
+
+# Example usage
+@count_calls
+def my_function():
+    print("my_function called")
+
+my_function()
+my_function()
+```
+
+In this example:
+
+- We define a decorator `count_calls` that wraps around a method.
+- Inside the wrapper function, we use `method.__qualname__` to get the qualified name of the method. This serves as a unique identifier for the method.
+- We use Redis to increment a counter stored with the key being the qualified name of the method. This allows us to track how many times each method is called.
+- We print the number of times the method has been called.
+- We apply the `@count_calls` decorator to the `my_function` method.
+- When `my_function` is called, the wrapper function increments the call count and calls the original function.
+
+This way, you can keep track of how many times each function is called and store that information in Redis (or any other data store) for further analysis or monitoring.
